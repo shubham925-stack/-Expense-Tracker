@@ -39,7 +39,7 @@ const addTransaction = async (req, res) => {
 };
 const getAllTransactions = async (req, res) => {
     try {
-        const { type, category, month, year, search } = req.query;
+        const { type, category, month, year, search, page = 1, limit = 10 } = req.query;
         let filter = {
             user: req.user._id
         };
@@ -63,11 +63,20 @@ const getAllTransactions = async (req, res) => {
                 $lt: endDate
             };
         }
-        const transactions = await Transaction.find(filter).sort({
-            date: -1
-        });
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const skip = (pageNumber - 1)*limitNumber;
+        const totalTransactions = await Transaction.countDocuments(filter);
+        const transactions = await Transaction.find(filter)
+            .sort({date: -1})
+            .skip(skip)
+            .limit(limitNumber);
+        const totalPages = Math.ceil(totalTransactions / limitNumber);
         res.status(200).json({
             success: true,
+            currentPage: pageNumber,
+            totalPages,
+            totalTransactions,
             count: transactions.length,
             transactions
         });

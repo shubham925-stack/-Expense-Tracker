@@ -4,6 +4,10 @@ const setBudget = async (req, res) => {
     try {
         const { monthlyLimit } = req.body;
 
+        const currentDate = new Date();
+        const month = currentDate.getMonth() + 1;
+        const year = currentDate.getFullYear();
+
         if (!monthlyLimit) {
             return res.status(400).json({
                 success: false,
@@ -12,7 +16,9 @@ const setBudget = async (req, res) => {
         }
 
         let budget = await Budget.findOne({
-            user: req.user._id
+            user: req.user._id,
+            month,
+            year
         });
 
         if (budget) {
@@ -28,6 +34,8 @@ const setBudget = async (req, res) => {
 
         budget = await Budget.create({
             user: req.user._id,
+            month,
+            year,
             monthlyLimit
         });
 
@@ -47,8 +55,14 @@ const setBudget = async (req, res) => {
 
 const getBudget = async (req, res) => {
     try {
+        const currentDate = new Date();
+        const month = currentDate.getMonth() + 1;
+        const year = currentDate.getFullYear();
+
         const budget = await Budget.findOne({
-            user: req.user._id
+            user: req.user._id,
+            month,
+            year
         });
 
         if (!budget) {

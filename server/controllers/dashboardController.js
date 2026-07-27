@@ -39,6 +39,85 @@ const getDashboardSummary = async (req, res) => {
         });
     }
 };
+
+const getDailySpending = async (req, res) => {
+    try {
+        const { month, year } = req.query;
+        const selectedMonth = Number(month);
+        const selectedYear = Number(year);
+        const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+        const endDate = new Date(selectedYear, selectedMonth, 1);
+        const dailySpending = await Transaction.aggregate([
+            {
+                $match: {
+                    user: req.user._id,
+                    type: "expense",
+                    date: {
+                            $gte: startDate,
+                            $lt: endDate
+                    }
+                }
+            },
+            {
+                $group:{
+                    _id:{
+                        $dateToString:{
+                            format:"%Y-%m-%d",
+                            date:"$date"
+                        }
+                    },
+                        totalExpense:{
+                            $sum:"$amount"
+                        }
+                }
+            },
+            {
+                $sort:{
+                    _id:1
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id",
+                    totalExpense: 1
+                }
+            }
+        ]);
+        res.status(200).json({
+            success: true,
+            data: dailySpending
+        });
+
+    }catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+const getRecentTransactions = async (req, res) => {
+
+    try {
+        const transactions = await Transaction.find({
+            user: req.user._id,
+        })
+            .sort({ date: -1 })
+            .limit(5);
+        res.status(200).json({
+            success:true,
+            transactions,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success:false,
+            message: error.message,
+        });
+    }
+}
+
 module.exports = {
     getDashboardSummary,
+    getDailySpending,
+    getRecentTransactions
 };

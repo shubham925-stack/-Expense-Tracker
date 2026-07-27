@@ -73,7 +73,7 @@ const getAllTransactions = async (req, res) => {
             .limit(limitNumber);
         const totalPages = Math.ceil(totalTransactions / limitNumber);
         res.status(200).json({
-            success: true,
+            success: true, 
             currentPage: pageNumber,
             totalPages,
             totalTransactions,

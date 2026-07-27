@@ -1,0 +1,47 @@
+.recent-transactions {
+    margin-top: 30px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.recent-transactions h2 {
+    margin-bottom: 20px;
+}
+
+.transaction-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.transaction-card:last-child {
+    border-bottom: none;
+}
+
+.transaction-left h4 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.transaction-left p {
+    margin-top: 5px;
+    color: #666;
+    font-size: 14px;
+}
+
+.amount {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.income {
+    color: #16a34a;
+}
+
+.expense {
+    color: #dc2626;
+}

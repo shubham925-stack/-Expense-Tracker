@@ -1,18 +1,22 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
-
+import "../styles/Register.css"
 function Register() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
     const navigate = useNavigate();
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
+        if (password !== confirmPassword) {
+            alert("Passwords do not match.");
+            return;
+        }
         try {
             const response = await api.post("/auth/register", {
                 name,
@@ -33,51 +37,88 @@ function Register() {
         }
     };
 
-    return (
-        <div>
-            <h1>Register</h1>
+   return (
+        <div className="register-page">
+            <div className="register-card">
 
-            <form onSubmit={handleRegister}>
+                <h1>Create Your Account</h1>
 
-                <input
-                    type="text"
-                    placeholder="Enter Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
+                <p className="register-subtitle">
+                    Join Expense Tracker and start managing your finances today.
+                </p>
 
-                <input
-                    type="email"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+                <form onSubmit={handleRegister}>
 
-                <input
-                    type="text"
-                    placeholder="Enter Phone Number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                />
+                    <div className="form-group">
+                        <label>Full Name</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your full name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                <input
-                    type="password"
-                    placeholder="Enter Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                    <div className="form-group">
+                        <label>Email Address</label>
+                        <input
+                            type="email"
+                            placeholder="Enter your email address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                <button type="submit">
-                    Register
-                </button>
+                    <div className="form-group">
+                        <label>Phone Number</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your phone number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                        />
+                    </div>
 
-            </form>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            placeholder="Create a password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
-            <p>
-                Already have an account?{" "}
-                <Link to="/">Login</Link>
-            </p>
+                    <div className="form-group">
+                        <label>Confirm Password</label>
+                        <input
+                            type="password"
+                            placeholder="Confirm your password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                        />
+                    </div>
 
+                    <button
+                        type="submit"
+                        className="register-btn"
+                    >
+                        Create Account
+                    </button>
+
+                </form>
+
+                <p className="login-link">
+                    Already have an account?{" "}
+                    <Link to="/">Login</Link>
+                </p>
+
+            </div>
         </div>
     );
 }

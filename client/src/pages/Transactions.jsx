@@ -6,15 +6,19 @@ import TransactionTable from "../components/transactions/TransactionTable";
 import TransactionModal from "../components/transactions/TransactionModal";
 import { useNavigate } from "react-router-dom";
 import "../styles/Transactions.css";
+import TransactionSkeleton from "../components/skeleton/TransactionSkeleton";
 
 function Transactions() {
     const navigate = useNavigate();
     const [transactions, setTransactions] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const [loading, setLoading] = useState(true)
 
     const fetchTransactions = async (filters = {}) => {
         try {
+            setLoading(true);
+
             const response = await api.get("/transactions", {
                 params: filters,
             });
@@ -26,12 +30,18 @@ function Transactions() {
             } else {
                 alert(error.message);
             }
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchTransactions();
     }, []);
+
+    if(loading){
+        return <TransactionSkeleton/>
+    }
 
     const handleFilterChange = (filters) => {
         fetchTransactions(filters);

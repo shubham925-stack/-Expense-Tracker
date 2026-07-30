@@ -5,6 +5,7 @@ import SummaryCard from "../components/dashboard/SummaryCard";
 import "../styles/Dashboard.css";
 import ExpenseBarChart from "../components/dashboard/ExpenseBarChart";
 import RecentTransactions from "../components/dashboard/RecentTransactions";
+import DashboardSkeleton from "../components/skeleton/DashboardSkeleton";
 
 function Dashboard() {
     const [summary, setSummary] = useState(null);
@@ -12,7 +13,6 @@ function Dashboard() {
     const fetchSummary = async () => {
     try {
         const response = await api.get("/dashboard");
-        console.log(response.data);
         setSummary(response.data.summary);
     } catch (error) {
         if (error.response) {
@@ -27,7 +27,7 @@ useEffect(() => {
     }, []);
 
     if (!summary) {
-        return <h2>Loading...</h2>;
+        return <DashboardSkeleton/>
     }
     return (
     <>

@@ -1,29 +1,51 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import BudgetForm from "../components/budget/BudgetForm";
+import BudgetSummary from "../components/budget/BudgetSummary";
+import "../styles/Budget.css";
+import BudgetSkeleton from "../components/skeleton/BudgetSkeleton";
 
 function Budget() {
+    const navigate = useNavigate();
     const [budget, setBudget] = useState("");
-    const [currentBudget, setCurrentBudget] = useState(0);
-
+    const [budgetData, setBudgetData] = useState({
+    monthlyLimit: 0,
+    totalExpenses: 0,
+    remainingBudget: 0,
+    });
+    const [loading, setLoading] = useState(true);
     // Fetch current budget
     const fetchBudget = async () => {
         try {
+            setLoading(true);
+
             const response = await api.get("/budget");
 
             console.log(response.data);
 
-            setCurrentBudget(response.data.budget.monthlyLimit);
+            setBudgetData({
+                monthlyLimit: response.data.budget.monthlyLimit,
+                totalExpenses: response.data.totalExpenses || 0,
+                remainingBudget: response.data.remainingBudget || 0,
+            });
         } catch (error) {
             if (error.response && error.response.status === 404) {
-                setCurrentBudget(0);
-            } else if (error.response) {
+                setBudgetData({
+                    monthlyLimit: 0,
+                    totalExpenses: 0,
+                    remainingBudget: 0,
+                });
+            }else if (error.response) {
                 alert(error.response.data.message);
             } else {
                 alert(error.message);
             }
-        }
-    };
-
+        } finally{
+            setLoading(false)
+    }
+    }
+    
     // Save budget
     const handleSaveBudget = async (e) => {
         e.preventDefault();
@@ -50,29 +72,29 @@ function Budget() {
     useEffect(() => {
         fetchBudget();
     }, []);
+    if (loading) {
+        return <BudgetSkeleton />;
+    }
 
     return (
-        <div>
-            <h1>Monthly Budget</h1>
-
-            <form onSubmit={handleSaveBudget}>
-                <input
-                    type="number"
-                    placeholder="Enter Monthly Budget"
-                    value={budget}
-                    onChange={(e) => setBudget(e.target.value)}
-                />
-
-                <button type="submit">
-                    Save Budget
+        <div className="budget-container">
+            <div className="budget-header">
+                <h1>Budget Management</h1>
+                <button
+                    className="home-btn"
+                    onClick={() => navigate("/dashboard")}
+                >
+                    Dashboard
                 </button>
-            </form>
-
-            <hr />
-
-            <h2>Current Budget: ₹{currentBudget}</h2>
+            </div>
+            <BudgetForm
+                budget={budget}
+                setBudget={setBudget}
+                onSave={handleSaveBudget}
+            />
+            <BudgetSummary budgetData={budgetData} />
         </div>
-    );
+);
 }
 
 export default Budget;

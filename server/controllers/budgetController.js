@@ -1,4 +1,5 @@
 const Budget = require("../models/Budget");
+const Transaction = require("../models/Transaction");
 
 const setBudget = async (req, res) => {
     try {
@@ -71,10 +72,39 @@ const getBudget = async (req, res) => {
                 message: "Budget not found."
             });
         }
+        const startDate = new Date(year,month - 1, 1);
+        const endDate = new Date(year,month,1);
+
+        const expenses = await Transaction.aggregate([
+            {
+                $match:{
+                    user:req.user._id,
+                    type:"expense",
+                    date:{
+                        $gte:startDate,
+                        $lt: endDate
+                    }
+                }
+            },
+            {
+                $group:{
+                _id:null,
+                totalExpenses:{
+                    $sum:"$amount"
+                }
+            }
+            }
+        ]);
+        const totalExpenses =
+            expenses.length > 0 ? expenses[0].totalExpenses : 0;
+        const remainingBudget =
+            budget.monthlyLimit - totalExpenses
 
         res.status(200).json({
             success: true,
-            budget
+            budget,
+            totalExpenses,
+            remainingBudget
         });
 
     } catch (error) {
